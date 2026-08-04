@@ -15,3 +15,4 @@ The analytical queries in this repository focus on end-to-end operational insigh
 
 ## 📁 Repository Structure
 - `northwind_joins_and_window_functions.sql`: Main SQL script containing queries, operational joins, and windowing analytics.
+- `supply_chain_analysis.sql`: SQL queries focusing on logistics, supply chain operational metrics, and inventory data.
