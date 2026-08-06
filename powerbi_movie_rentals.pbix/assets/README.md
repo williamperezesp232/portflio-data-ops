@@ -24,7 +24,7 @@ The dashboard provides executive-level visibility into key business drivers, inc
 ---
 
 ## 📁 File Access
-You can download the primary **`tienda_peliculas.pbix`** file directly from this repository to review:
+You can download the primary **`PI_Movies_Store.pbix`** file directly from this repository to review:
 1. Data model relationships and table transformations.
 2. DAX metrics library.
 3. Page navigation setup and visual layout logic.
