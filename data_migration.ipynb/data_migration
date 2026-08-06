@@ -1,0 +1,244 @@
+
+pip install openpyxl
+
+import pandas as pd
+import numpy as np
+import random
+
+np.random.seed(42)
+random.seed(42)
+
+n = 8000
+
+
+case_ids = np.random.randint(100000, 102000, n)
+
+client_names = np.random.choice(
+    ['John Smith', 'Maria Lopez', 'Carlos Pérez', 'Anna Müller', ''],
+    n,
+    p=[0.3, 0.25, 0.2, 0.15, 0.1]  # some empty names
+)
+
+
+def random_date():
+    base = pd.to_datetime('2022-01-01') + pd.to_timedelta(
+        np.random.randint(0, 900), unit='D'
+    )
+    formats = [
+        base.strftime('%Y-%m-%d'),
+        base.strftime('%m/%d/%Y'),
+        base.strftime('%d-%m-%Y'),
+        base.strftime('%Y/%m/%d')
+    ]
+    return random.choice(formats)
+
+trial_dates = [random_date() for _ in range(n)]
+
+
+legal_fees = np.round(np.random.uniform(-500, 15000, n), 2)
+mask_text = np.random.rand(n) < 0.05
+legal_fees = legal_fees.astype(object)
+legal_fees[mask_text] = 'N/A'
+
+settlement_amounts = np.round(np.random.uniform(0, 50000, n), 2)
+
+
+case_status = np.random.choice(
+    ['Open', 'Closed', 'Pending', 'closed ', 'OPEN'],
+    n
+)
+
+
+source_system = np.random.choice(
+    ['Old_System', 'Excel_Import'],
+    n
+)
+
+
+df = pd.DataFrame({
+    'case_id': case_ids,
+    'client_name': client_names,
+    'trial_date': trial_dates,              # mixed formats
+    'legal_fees': legal_fees,                # negatives + text
+    'settlement_amount': settlement_amounts,
+    'case_status': case_status,              # inconsistent casing
+    'source_system': source_system
+})
+
+
+df.to_csv('legal_cases_migration.csv', index=False)
+
+print("Dataset created: legal_cases_migration.csv")
+print(df.head())
+
+df
+
+df.info()
+
+df.isna().sum()
+
+df['total_duplicados'] = df['case_id'].duplicated().sum()
+print(f"Alerta: Tenemos {total_duplicados} registros excedentes en la columna case_id.")
+
+
+df['case_status'] = (df['case_status'].str.strip().str.lower())
+
+df
+
+
+df['case_status'].value_counts()
+
+Empty = df[df['client_name'].isna()]
+print(Empty)
+
+
+df[df['client_name'].str.strip() == ''].shape
+
+
+df['trial_date_parsed'] = pd.to_datetime(df['trial_date'], errors='coerce')
+
+df['trial_date_parsed'].isna().sum()
+
+df[df['trial_date_parsed'].isna()][['trial_date']].reset_index(drop=True)
+
+df.info()
+
+df['legal_fees_clean'] = pd.to_numeric(df['legal_fees'], errors = 'coerce')
+
+df[['legal_fees_clean', 'legal_fees']]
+
+df['legal_fees_clean'].isna().sum()
+
+
+invalid_fees = df[df['legal_fees_clean'] <= 0]
+invalid_fees.shape
+
+
+df.groupby('source_system')['settlement_amount'].describe()
+
+df['source_system'].value_counts()
+
+# Cuántos casos únicos vs registros:
+df['case_id'].nunique()
+
+df[df['case_id'].duplicated()].head()
+
+df['legal_fees'] = pd.to_numeric(df['legal_fees'], errors = 'coerce')
+
+error_fees = (df['legal_fees'] <= 0).sum()
+error_fees
+
+def validate_legal_fees(series):
+    return (series > 0).all()
+
+validate_legal_fees(df['legal_fees_clean'].dropna())
+
+data_quality = {
+    "total_rows": len(df),
+    "duplicate_case_ids": df['case_id'].duplicated().sum(),
+    "invalid_dates": df['trial_date_parsed'].isna().sum(),
+    "invalid_legal_fees": (df['legal_fees_clean'] <= 0).sum(),
+    "missing_client_names": (df['client_name'].str.strip() == '').sum()
+}
+
+data_quality
+
+import matplotlib.pyplot as plt
+
+df['case_status'].value_counts().plot(kind='bar')
+plt.title("Cases by Status")
+plt.show()
+
+df.loc[df['client_name'].str.strip() == '', 'client_name'] = 'UNKNOWN_CLIENT'
+
+df[df['client_name'] == 'UNKNOWN_CLIENT']
+
+df['trial_date_clean'] = (
+    df['trial_date']
+    .str.replace('.','-', regex= False)
+    .str.replace('/','-', regex= False))
+
+df['trial_date_parsed'] = pd.to_datetime(df['trial_date_clean'], errors='coerce')
+
+df.drop('total_duplicados', axis = 1, inplace = True)
+
+
+
+invalid_dates = df[df['trial_date_parsed'].isna()]
+invalid_dates
+
+invalid_fees = df[
+    (df['legal_fees_clean'].isna()) |
+    (df['legal_fees_clean'] <= 0)
+]
+invalid_fees
+
+# legal_fees inválidos (<= 0 o texto)
+
+df.loc[df['legal_fees_clean'] <= 0, 'legal_fees_clean'] = np.nan
+
+df
+
+print(df['source_system'].value_counts())
+
+old_system = df[df['source_system'] == 'Old_System']
+new_system = df[df['source_system'] == 'Excel_Import']
+
+comparision = old_system.merge(new_system, on = 'case_id', suffixes =('_old','_new'), how='inner')
+comparision
+
+discrepancias = comparision[comparision['settlement_amount_old'] != comparision['settlement_amount_new']]
+
+discrepancias
+
+df.isna().sum() / len(df) * 100
+
+df.isna().sum()
+
+duplicados = df['case_id'].duplicated().sum()
+print(f"Registros redundantes: {duplicados}")
+
+nulos_criticos = df[df['legal_fees'].isnull()]
+nulos_criticos
+
+basura = ["N/A", "NONE", " ", "", "PENDIENTE"]
+
+
+for col in df.select_dtypes(include='object').columns:
+    
+    coincidencias = df[df[col].astype(str).str.upper().isin(basura)]
+    
+   
+    if len(coincidencias) > 0:
+        print(f"⚠️ Columna '{col}': tiene {len(coincidencias)} valores que parecen nulos (basura).")
+
+df
+
+import unicodedata
+
+def normalize_text(text):
+    if pd.isna(text):
+        return text
+    text = text.strip().lower()
+    text = unicodedata.normalize('NFKD', text)
+    text = ''.join(c for c in text if not unicodedata.combining(c))
+    return text
+
+df['client_name_original'] = df['client_name']
+df['client_name_normalized'] = df['client_name'].apply(normalize_text)
+
+df
+
+df[df['case_id'].duplicated(keep=False)]
+
+plt.style.use('ggplot') 
+
+df['case_status'].value_counts().plot(kind='bar', color='skyblue', edgecolor='black')
+
+plt.title("Distribución de Estatus de Casos", fontsize=14)
+plt.xlabel("Estado del Caso")
+plt.ylabel("Cantidad de Registros")
+
+plt.xticks(rotation=45)
+
+plt.show()
