@@ -1,4 +1,16 @@
 venv/
+env/
+ENV/
+
 __pycache__/
-*.csv
+*.py[cod]
+*$py.class
+
 .env
+*.csv
+
+.vscode/
+.idea/
+
+# Logs
+*.log
