@@ -1,57 +1,57 @@
 # 🚀 Data Ops & Analytics Portfolio
 
-¡Bienvenido a mi repositorio de proyectos de analítica de datos, ingeniería de datos y Business Intelligence! Aquí organizo soluciones de extremo a extremo que van desde consultas SQL avanzadas hasta pipelines modulares en Python y tableros en Power BI.
+Welcome to my data engineering and analytics portfolio! This repository showcases end-to-end data solutions spanning automated ETL pipelines in Python, advanced SQL analytical modeling, data integrity audits, and interactive Power BI dashboards.
 
 ---
 
-## 🛠️ Tech Stack General
+## 🛠️ General Tech Stack
 
-* **Base de Datos & SQL:** PostgreSQL (CTEs, Window Functions, Auditoría de Integridad).
-* **Lenguajes & Librerías:** Python 3.x (`pandas`, `SQLAlchemy`, `openpyxl`, `logging`).
-* **BI & Visualización:** Power BI (`.pbix`).
-* **Herramientas de Desarrollo:** VS Code, Git, GitHub CLI.
-
----
-
-## 📦 Proyectos Destacados
-
-### 1. Supply Chain ETL Pipeline & Capital Inmovilizado (Proyecto Principal)
-* **Ubicación:** `src/`, `main.py`, `supply_chain.sql/`
-* **Descripción:** Pipeline modular de extracción, transformación y carga (ETL) que automatiza la clasificación de SKUs según sus tiempos de envío y cuantifica el capital estancado en bodega.
-* **Aspectos Técnicos:**
-  * Consultas SQL complejas con CTEs y `SUM() OVER()` para análisis de Pareto (80/20).
-  * Módulo modular en Python con manejo de logs y captura de excepciones (`try/except`).
-  * Generación de reportes dinámicos en Excel (`data/*.xlsx`) con estilos formateados vía `openpyxl`.
-
-#### 📊 Impacto Financiero & Resultados:
-* **Identificación:** Se aislaron **60 SKUs principales** en riesgo ($\ge 3.5$ días de permanencia).
-* **Análisis Pareto:** El **Top 10 de productos** concentra más del **25% del capital total inmovilizado**.
-* **Optimización:** Permite liberar un **15% - 20% del flujo de caja operativo** y reducir costes de almacenamiento en un **10% - 12%**.
+* **Database & SQL:** PostgreSQL (CTEs, Window Functions, Data Integrity & Migration Audits).
+* **Programming & ETL:** Python 3.x (`pandas`, `SQLAlchemy`, `openpyxl`, `logging`).
+* **BI & Data Visualization:** Power BI (`.pbix`).
+* **Version Control & Tooling:** VS Code, Git, GitHub CLI.
 
 ---
 
-### 2. Análisis SQL Avanzado & Casos de Negocio
-* **Ubicación:** `northwind.sql/`, `formula1.sql/`
-* **Descripción:** Repositorio de scripts de modelado y analítica SQL sobre bases de datos complejas (gestión de ventas e inventarios con Northwind, análisis de rendimiento temporal con métricas de Formula 1).
-* **Competencias:** Joins complejos, funciones de ventana para rankings y agregaciones dinámicas.
+## 📦 Featured Projects
+
+### 1. Supply Chain ETL Pipeline & Capital Allocation Analysis (Core Project)
+* **Location:** `src/`, `main.py`, `supply_chain.sql/`
+* **Description:** An end-to-end modular ETL pipeline that automates SKU risk classification based on fulfillment lead times and quantifies capital tied up in slow-moving inventory.
+* **Technical Highlights:**
+  * Advanced SQL queries utilizing CTEs and `SUM() OVER()` window functions to execute Pareto (80/20) risk distribution.
+  * Production-grade Python orchestration featuring structured `logging` and robust `try/except` error handling.
+  * Automated executive reporting generating stylized Excel workbooks (`data/*.xlsx`) via `openpyxl`.
+
+#### 📊 Business Impact & Results:
+* **Risk Identification:** Isolated **60 high-risk SKUs** exceeding the operational shipping threshold ($\ge 3.5$ days average).
+* **Pareto Capital Concentration:** The **Top 10 SKUs** account for over **25% of total immobilized capital** in inventory.
+* **Financial Optimization:** Liquidating or optimizing this stock unlocks **15%–20% of operational working capital** and reduces annual holding costs by **10%–12%**.
+
+---
+
+### 2. Advanced SQL Modeling & Business Cases
+* **Location:** `northwind.sql/`, `formula1.sql/`
+* **Description:** Comprehensive SQL script collection modeling complex business domains—including sales/inventory operations (Northwind) and time-series performance metrics (Formula 1).
+* **Key Skills:** Complex multi-table joins, ranking window functions, and dynamic aggregation queries.
 
 ---
 
 ### 3. Data Integrity & Migration Audit
-* **Ubicación:** `data_integrity.ipynb`, `data_migration.ipynb`
-* **Descripción:** Notebooks de auditoría para la validación de consistencia, duplicados y calidad de datos previa a procesos de migración entre entornos.
+* **Location:** `data_integrity.ipynb`, `data_migration.ipynb`
+* **Description:** Data quality and audit notebooks designed to validate schema consistency, detect duplicate records, and ensure data hygiene prior to cross-environment migrations.
 
 ---
 
 ### 4. Power BI Dashboards
-* **Ubicación:** `powerbi_movie_rentals.pbix/assets/`
-* **Descripción:** Tablero interactivo para el análisis de rendimiento de alquileres de películas, métricas de ingresos recurrentes y comportamiento del cliente.
+* **Location:** `powerbi_movie_rentals.pbix`
+* **Description:** An interactive dashboard analyzing movie rental performance, recurring revenue streams, and customer retention trends.
 
 ---
 
-## ⚙️ Cómo Ejecutar el Pipeline ETL de Supply Chain
+## ⚙️ How to Run the Supply Chain ETL Pipeline
 
-1. **Clonar el repositorio:**
+1. **Clone the repository:**
    ```bash
    git clone [https://github.com/williamperezesp232/portflio-data-ops.git](https://github.com/williamperezesp232/portflio-data-ops.git)
    cd portflio-data-ops
