@@ -1,5 +1,5 @@
 import pandas as pd
-from src.extract import get_db_connection
+from src.connection import engine
 
 def extract_capital_inmovilizado():
     """
@@ -42,6 +42,6 @@ def extract_capital_inmovilizado():
     ORDER BY capital_inmovilizado DESC;
     """
     
-    engine = get_db_connection()
     df = pd.read_sql(query, engine)
     return df
+   
