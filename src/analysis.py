@@ -2,87 +2,68 @@ import pandas as pd
 
 
 def calculate_abc_classification(df: pd.DataFrame) -> pd.DataFrame:
-    """Calcula la clasificación ABC basada en el valor total de ventas acumuladas (Regla de Pareto 80/20).
+    """Calcula la clasificación ABC basada en el principio de Pareto (80/15/5).
 
-    Agrega la columna 'abc_segment' (A, B o C) al DataFrame.
+    Detecta automáticamente la columna de ingresos/ventas en el DataFrame.
     """
-    # 1. Asegurar que trabajamos con una copia
-    data = df.copy()
+    if df.empty:
+        return df
 
-    # 2. Calcular las ventas totales si no existe la columna
-    if (
-        "total_revenue" not in data.columns
-        and "Order Item Quantity" in data.columns
-        and "Product Price" in data.columns
-    ):
-        data["total_revenue"] = (
-            data["Order Item Quantity"] * data["Product Price"]
-        )
+    abc_df = df.copy()
 
-    # 3. Agrupar por producto para calcular ingresos por SKU
-    group_cols = []
-    if "Product Card Id" in data.columns:
-        group_cols.append("Product Card Id")
-    if "Product Name" in data.columns:
-        group_cols.append("Product Name")
+    # Detectar dinámicamente la columna de ingresos o ventas
+    revenue_col = None
+    possible_cols = [
+        "total_revenue",
+        "revenue",
+        "total_sales",
+        "sales",
+        "ingresos",
+        "ventas",
+        "valor_total",
+    ]
 
-    if group_cols:
-        abc_df = (
-            data.groupby(group_cols)["total_revenue"].sum().reset_index()
-        )
+    for col in possible_cols:
+        if col in abc_df.columns:
+            revenue_col = col
+            break
+
+    # Si no coincide con los nombres estándar, tomar la primera columna numérica que no sea un ID/SKU
+    if not revenue_col:
+        numeric_cols = [
+            c
+            for c in abc_df.select_dtypes(include=["number"]).columns
+            if "sku" not in c.lower() and "id" not in c.lower()
+        ]
+        if numeric_cols:
+            revenue_col = numeric_cols[0]
+        else:
+            raise KeyError(
+                f"No se encontró ninguna columna de ingresos/ventas. Columnas disponibles: {list(abc_df.columns)}"
+            )
+
+    # Ordenar descendente por ingresos/ventas
+    abc_df = abc_df.sort_values(by=revenue_col, ascending=False).reset_index(
+        drop=True
+    )
+
+    # Cálculo del porcentaje acumulado de ingresos
+    total_val = abc_df[revenue_col].sum()
+    if total_val > 0:
+        abc_df["cum_sum"] = abc_df[revenue_col].cumsum()
+        abc_df["cum_perc"] = abc_df["cum_sum"] / total_val
     else:
-        abc_df = data.copy()
+        abc_df["cum_perc"] = 0
 
-    # 4. Ordenar de mayor a menor ingreso
-    abc_df = abc_df.sort_values(by="total_revenue", ascending=False)
-
-    # 5. Calcular porcentaje acumulado del valor total de ventas
-    total_sales = abc_df["total_revenue"].sum()
-    abc_df["cumulative_revenue"] = abc_df["total_revenue"].cumsum()
-    abc_df["cumulative_percentage"] = (
-        abc_df["cumulative_revenue"] / total_sales
-    ) * 100
-
-    # 6. Asignar los segmentos A (<= 80%), B (80% - 95%) y C (> 95%)
-    def assign_abc(pct):
-        if pct <= 80.0:
+    # Asignación de segmentos ABC según Pareto
+    def assign_abc(cum_perc):
+        if cum_perc <= 0.80:
             return "A"
-        elif pct <= 95.0:
+        elif cum_perc <= 0.95:
             return "B"
         else:
             return "C"
 
-    abc_df["abc_segment"] = abc_df["cumulative_percentage"].apply(assign_abc)
+    abc_df["abc_segment"] = abc_df["cum_perc"].apply(assign_abc)
 
     return abc_df
-
-
-if __name__ == "__main__":
-    # Prueba rápida unitaria del módulo con datos sintéticos
-    sample_data = pd.DataFrame(
-        {
-            "Product Card Id": [101, 102, 103, 104, 105],
-            "Product Name": [
-                "Balón Padel Pro",
-                "Pala Varlion",
-                "Zapatillas Asics",
-                "Grip",
-                "Protector",
-            ],
-            "Order Item Quantity": [10, 50, 20, 5, 2],
-            "Product Price": [15.0, 180.0, 90.0, 5.0, 4.0],
-        }
-    )
-
-    result_df = calculate_abc_classification(sample_data)
-    print("--- Clasificación ABC generada con éxito ---")
-    print(
-        result_df[
-            [
-                "Product Name",
-                "total_revenue",
-                "cumulative_percentage",
-                "abc_segment",
-            ]
-        ]
-    )

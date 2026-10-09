@@ -16,12 +16,13 @@ Welcome to my data engineering and analytics portfolio! This repository showcase
 ## 📦 Featured Projects
 
 ### 1. Supply Chain ETL Pipeline & Capital Allocation Analysis (Core Project)
-* **Location:** `src/`, `main.py`, `supply_chain.sql/`
+* **Location:** `src/`, `main.py`, `supply_chain/`
 * **Description:** An end-to-end modular ETL pipeline that automates SKU risk classification based on fulfillment lead times and quantifies capital tied up in slow-moving inventory.
 * **Technical Highlights:**
   * Advanced SQL queries utilizing CTEs and `SUM() OVER()` window functions to execute Pareto (80/20) risk distribution.
   * Production-grade Python orchestration featuring structured `logging` and robust `try/except` error handling.
-  * Automated executive reporting generating stylized Excel workbooks (`data/*.xlsx`) via `openpyxl`.
+  * Automated executive reporting generating stylized Excel workbooks (`data/*.xlsx`) via `openpyxl` with conditional risk formatting.
+  * Centralized configuration managing environment variables (`.env`) via `src/config.py`.
 
 #### 📊 Business Impact & Results:
 * **Risk Identification:** Isolated **60 high-risk SKUs** exceeding the operational shipping threshold ($\ge 3.5$ days average).
